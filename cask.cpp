@@ -13,7 +13,8 @@ int numOfFull, numOfHalf, numOfEmpty;
 int numOfPeople, numOfBarrels;
 
 // Computer generated amounts
-int wineAmountOwed, barrelsOwed;
+double wineAmountOwed;
+int barrelsOwed;
 
 
 /*
@@ -46,12 +47,10 @@ bool enoughWine() {
      * Soooo.... what shall we do????
      */
      
-    if (total % numOfPeople == 0) {
+    if (total % numOfPeople == 0 || ((total / numOfPeople) / 0.5)) {
         wineAmountOwed = total / numOfPeople;
         check = true;
     }
-    
-    cout << "\n\n\n\n " total % numOfPeople << "  \n\n\n\n\n\n\n\n";
     
     return check;
         
@@ -90,32 +89,35 @@ void distribute() {
     int thisPersonsBarrelAmount = 0;
     
     for (int i = 0; i < numOfPeople; i++) {
-        for (int j = 0; j < numOfBarrels; j++) {
+        for (int j = 0; j < 7; j++) {
+            if (j + 2 >= 7) break;
             if (thisPersonsWineAmount + 1 <= wineAmountOwed) {
                 people[i][j] = 1;
-                thisPersonsWineAmount + 1;
-                thisPersonsBarrelAmount + 1;
+                thisPersonsWineAmount += 1;
+                thisPersonsBarrelAmount += 1;
             }
 
             if (thisPersonsWineAmount + 0.5 <= wineAmountOwed) {
-                people[i][j] = 0.5;
-                thisPersonsWineAmount + 0.5;
-                thisPersonsBarrelAmount + 1;
+                people[i][j+1] = 0.5;
+                thisPersonsWineAmount += 0.5;
+                thisPersonsBarrelAmount += 1;
             }
 
+
             if (thisPersonsBarrelAmount + 1 <= barrelsOwed) {
-                people[i][j] = 0;
-                thisPersonsBarrelAmount + 1;
+                people[i][j+2] = 0;
+                thisPersonsBarrelAmount += 1;
             }
+
         }
         // Don't bloody forget to reset the wine/barrel amount for the next person!
         thisPersonsWineAmount = 0;
-        thisPersonsBarrelAmount + 1;
+        thisPersonsBarrelAmount = 0;
     }
 
     for (int i = 0; i < numOfPeople; i++) {
-        cout << "\nPerson " << i;
-        for (int j = 0; j < numOfBarrels; j++) {
+        cout << "\nPerson " << i << endl;
+        for (int j = 0; j < 7; j++) {
             cout << people[i][j] << ", ";
         }
 
@@ -139,3 +141,4 @@ int main() {
 
     return 0;
 }
+
