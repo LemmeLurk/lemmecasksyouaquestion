@@ -1,0 +1,44 @@
+you have a check for distributing the wine casks evenly -- that is, that there
+is enough to be divdided evenly
+
+but shouldn't there be an algorithm to determine -- ahead of time -- what those
+ammounts should look like
+eg. 3 Full, 2 Empty, 4 Empty -- abut that amount would need to be flexible,
+since I know 00 fro experience,only after having doing it -- that not everyone
+won't get that amount....
+
+
+Right now, I am letteing the program figure out the amounts through for loop
+iteration and if/else.... just seems sloppy
+
+
+0000
+
+can you get the total and make that once using
+then multiply that method by the number of people
+
+in other words, get the exact amount of casks of ea type that are needed to make
+the wineAmountOwed, Once -- then multiple those casks used to 
+
+
+Accumulate the type of each casks -- meaning find the total of ea
+
+get wine totals
+Full  : 7 x 1.0 = 7.0
+Half  : 7 x 0.5 = 3.5
+Empty : 7 x 0.0 = 0.0
+
+
+Total = 10.5
+
+
+get Amount owed
+wineType * wineType.value +
+wineType * wineType.value /
+numOfPeople
+
+(7 + (7 * 0.5)) / 3 = 3.5
+
+
+
+
