@@ -40,5 +40,12 @@ numOfPeople
 (7 + (7 * 0.5)) / 3 = 3.5
 
 
+----
 
+[!] Set the barrels owed after successfully distributing the wine amount to the
+first person.... how to do this?
+
+----
+while (person1.wineAmount/barrelAmount != person2 && person3)
+    distribute()
 

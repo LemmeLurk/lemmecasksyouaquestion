@@ -11,11 +11,19 @@ using namespace std;
 int numOfFull, numOfHalf, numOfEmpty;
 
 // User input -- how many people
-int numOfPeople, numOfBarrels;
+int numOfPeople; 
+// User inputs amount of each type -- compute total amount
+int numOfBarrels;
 
 // Computer generated amounts
 double wineAmountOwed;
-int barrelsOwed;
+int    barrelsOwed;
+
+// Simple Person 'object'
+struct Person {
+    double wineAmount = 0;
+    int    barrelAmount = 0;
+};
 
 
 /*
@@ -31,53 +39,32 @@ bool enoughBarrels() {
 }
 
 /*
- * First problem is that there is a fractional part that needs to be accounted
- * for -- I am still hard coding that this fractional part is .5 (because this
- * is the half bottles of wine)
- * This is fine if the ammounts never change.. 
- * This works so long as the business rules don't change
+ * First find out if the wineAmount allocated to each can be made with the
+ * quanity of wine given
  */
 bool enoughWine() {
-
+    // Assume it won't work; let the computation change this to true if need be
     bool check = false;
     
     // Find out how much wine there is total
-    // Jorges Forulma: ((7+(7*.05))/3)=3.5;
     double total = numOfFull + (numOfHalf * 0.5);
 
+    
+    // Case 1.) Total amount of wine divides evenly among the number of people
+    // Case 2.) Total / numOfPeople has remainder that can be made by half
+    // bottles -- represented by 0.5
     // If it divides evenly, Compute and Store result of division
     // Otherwise, return false
-    
-    /*
-     * First find out if the wineAmount allocated to each can be made with the
-     * quanity of wine given
-     * Next, distribute the wine -- giving first from the FullWine, then Half
-     *
-     * Lastly, will need to distribute barrels -- the default problem causes the
-     * last guy to get a lot more barrels -- because all that was left was half,
-     * and so he ended up with 2:1 
-     */
-    
-    // Total does not divide evenly, nor can the remainder be made from the Half
-    // bottles
-    if (total / numOfPeople != 0 && fmod)
-    float fractionalPart = total / numOfPeople;
-
-    // If the whole numbers can be made using the Full amounts
-    // and the fractional part can be made using the fractional part
-    if (((int)total % numOfPeople == 0) ||
-        total 
-        fmod(fractionalPart, 0.5) == 0 {
-
+    if (total % total == 0 || (
+            (total / numOfPeople != 0) && 
+            fmod(fmod(total, numOfPeople), 0.5) == 0)) {
+        // Compute and Store the wine amount owed to each person
         wineAmountOwed = total / numOfPeople;
         check = true;
     }
     
     return check;
 }
-
-// Distribute until == All wine is equal between the three, all casks are equal
-// between the three, and there are 0 casks left
 
 void inputAmounts() {
     cout << "How many Full?";
@@ -96,70 +83,103 @@ void inputAmounts() {
     numOfBarrels = numOfFull + numOfHalf + numOfEmpty;
 }
 
+bool wineAmountEven(struct Person *people) {
+    bool check = true;
 
-void distribute() {
-    char fullBarrels[numOfFull]; 
-    char halfBarrels[numOfHalf]; 
-    char emptyBarrels[numOfEmpty];
-
-    // use struct instead
-    char people[numOfPeople][numOfBarrels];
-
-    int thisPersonsWineAmount = 0;
-    int thisPersonsBarrelAmount = 0;
-    
+    int amounts[numOfPeople];
     for (int i = 0; i < numOfPeople; i++) {
-        int j = 0;
-        while (thisPersonsWineAmount < wineAmountOwed) {
-            // Shouldn't there be a check for giving away more 'Full Casks' than
-            // are in stock?
-            if (thisPersonsWineAmount + 1 <= wineAmountOwed) {
-                people[i][j] = 'F';
-                j++;
-                thisPersonsWineAmount += 1;
-                thisPersonsBarrelAmount += 1;
+        amounts[i] = people[i].wineAmount;
+    }
 
+    int currentAmount = amounts[0].wineAmount;
+
+    for (int i = numOfPeople - 1; i >= 1; i--) {
+        // First instance of a true means that not all amounts are even
+        if (amounts[i].wineAmount != currentAmount) {
+            check = false;
+            break;
+        }
+    }
+
+    return check;
+}
+
+void barrelAmountEven(struct Person *people) {
+    bool check = true; 
+
+    int amounts[numOfPeople];
+    for (int i = 0; i < numOfPeople; i++) {
+        amounts[i] = people[i].barrelAmount;
+    }
+
+    int currentAmount = amounts[0].barrelAmount;
+
+    for (int i = numOfPeople - 1; i > 0; i--) {
+        // First instance of a true means that not all amounts are even
+        if (amounts[i].barrelAmount != currentAmount) {
+            check = false;
+            break;
+        }
+    }
+
+    return check;
+}
+
+
+// Distribute until == All wine is equal between the three, all casks are equal
+// between the three, and there are 0 casks left
+void distribute(struct Person *person) {
+
+    // Doesn't return true -- continue distributing
+    while (!wineAmountEven(person)) {
+        // Loop through as many people as needed
+        for (int i = 0; i < numOfPeople; ++i) {
+            // Give Full?
+            if (person[i].wineAmount + 1 < wineAmountOwed && numOfFull > 0) {
+                person[i].wineAmount++;
+                person[i].barrelAmount++;
                 --numOfFull;
             }
+            // Give Half?
+            else if (person[i].wineAmount + 0.5 <= wineAmountOwed && 
+                numOfHalf > 0) {
 
-            if (thisPersonsWineAmount + 0.5 <= wineAmountOwed) {
-                people[i][j] = 'H';
-                j++;
-                thisPersonsWineAmount += 1;
-                thisPersonsBarrelAmount += 1;
-
+                person[i].wineAmount += 0.5;
+                person[i].barrelAmount++;
                 --numOfHalf;
-            }
-
-            // Should I rethink giving people Empty barrels just for the hell of
-            // it? 
-            // Should it be in a seperate function call -- that is done after
-            // the amounts are poured in order to distribute the empty until all
-            // people have an even amount of barrels?
-            if (thisPersonsBarrelAmount + 1 <= barrelsOwed) {
-                people[i][j] = 'E';
-                j++;
-
-                thisPersonsBarrelAmount += 1;
-
-                --numOfEmpty;
             }
         }
 
+        // Check that amount is even, and given everyone same amount of casks
+    }
 
-        // Don't bloody forget to reset the wine/barrel amount for the next person!
-        thisPersonsWineAmount = 0;
-        thisPersonsBarrelAmount = 0;
-        j = 0;
+    while (!barrelAmountEven(person)) {
+        for (int i = 0; i < numOfPeople; ++i) {
+            if (person[i].barrelAmount + 1 < barrelsOwed && numOfEmpty > 0) {
+                person[i].barrelAmount++;
+                --numOfEmpty;
+            }
+        }
     }
 
     for (int i = 0; i < numOfPeople; i++) {
         cout << "\nPerson " << i << endl;
-        for (int j = 0; j < 7; j++) {
-            cout << people[i][j] << ", ";
-        }
+        
+        cout << "Wine amount: \t";
+        cout << person[i].wineAmount << endl;
+
+        cout << "Barrel amount: \t";
+        cout << person[i].barrelAmount << endl;
 
         cout << "\n\n";
+    }
+}
+
+// Why pass size if numOfPeople is available? -- sig.'s more explicit, perhaps?
+void createPersons(struct Person *person, int size) {
+    for (int i = 0; i < size; ++i) { 
+        person[i].wineAmount   = 0;
+        person[i].barrelAmount = 0;
     }
 }
 
@@ -170,9 +190,15 @@ int main() {
     // Start by getting user's input
     inputAmounts();
 
+    // Create array of Person 'objects' -- size of numOfPeople
+    struct Person people[numOfPeople];
+    
+    // Fill in the values
+    createPersons(people, numOfPeople);
+
     // Make sure this is possible -- otherwise, end.
     if (enoughBarrels() && enoughWine())
-        distribute();
+        distribute(people);
     else
         cout << ".....do the math.\n\n That shit don't work.";
 
