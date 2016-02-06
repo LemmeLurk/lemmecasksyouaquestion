@@ -21,7 +21,7 @@ int    barrelsOwed;
 
 // Simple Person 'object'
 struct Person {
-    double wineAmount = 0;
+    double wineAmount   = 0.0;
     int    barrelAmount = 0;
 };
 
@@ -55,9 +55,8 @@ bool enoughWine() {
     // bottles -- represented by 0.5
     // If it divides evenly, Compute and Store result of division
     // Otherwise, return false
-    if (total % total == 0 || (
-            (total / numOfPeople != 0) && 
-            fmod(fmod(total, numOfPeople), 0.5) == 0)) {
+    if (fmod(total, numOfPeople) == 0 || 
+            (fmod(fmod(total, numOfPeople), 0.5) == 0)) {
         // Compute and Store the wine amount owed to each person
         wineAmountOwed = total / numOfPeople;
         check = true;
@@ -86,16 +85,19 @@ void inputAmounts() {
 bool wineAmountEven(struct Person *people) {
     bool check = true;
 
-    int amounts[numOfPeople];
+    double amounts[numOfPeople];
     for (int i = 0; i < numOfPeople; i++) {
         amounts[i] = people[i].wineAmount;
     }
 
-    int currentAmount = amounts[0].wineAmount;
+    double currentAmount = amounts[0];
 
     for (int i = numOfPeople - 1; i >= 1; i--) {
-        // First instance of a true means that not all amounts are even
-        if (amounts[i].wineAmount != currentAmount) {
+        // First instance when this check fails means not all amounts are even
+        if (amounts[i] == currentAmount) {
+            continue;
+        }
+        else {
             check = false;
             break;
         }
@@ -104,19 +106,21 @@ bool wineAmountEven(struct Person *people) {
     return check;
 }
 
-void barrelAmountEven(struct Person *people) {
+bool barrelAmountEven(struct Person *people) {
     bool check = true; 
 
-    int amounts[numOfPeople];
+    double amounts[numOfPeople];
     for (int i = 0; i < numOfPeople; i++) {
         amounts[i] = people[i].barrelAmount;
     }
 
-    int currentAmount = amounts[0].barrelAmount;
+    double currentAmount = amounts[0];
 
     for (int i = numOfPeople - 1; i > 0; i--) {
-        // First instance of a true means that not all amounts are even
-        if (amounts[i].barrelAmount != currentAmount) {
+        if (amounts[i] == currentAmount) {
+            continue;
+        }
+        else {
             check = false;
             break;
         }
@@ -129,30 +133,34 @@ void barrelAmountEven(struct Person *people) {
 // Distribute until == All wine is equal between the three, all casks are equal
 // between the three, and there are 0 casks left
 void distribute(struct Person *person) {
-
-    // Doesn't return true -- continue distributing
-    while (!wineAmountEven(person)) {
-        // Loop through as many people as needed
-        for (int i = 0; i < numOfPeople; ++i) {
+    // Loop through as many people as needed
+    for (int i = 0; i < numOfPeople; ++i) {
+        for (int j = 0; j < numOfBarrels; ++j) {
             // Give Full?
-            if (person[i].wineAmount + 1 < wineAmountOwed && numOfFull > 0) {
+            if (person[i].wineAmount + 1 < wineAmountOwed && 
+                    numOfFull > 0) {
                 person[i].wineAmount++;
                 person[i].barrelAmount++;
                 --numOfFull;
             }
             // Give Half?
             else if (person[i].wineAmount + 0.5 <= wineAmountOwed && 
-                numOfHalf > 0) {
+                    numOfHalf > 0) {
 
                 person[i].wineAmount += 0.5;
                 person[i].barrelAmount++;
                 --numOfHalf;
             }
+            else {
+                cout << "Person " << i << endl;
+                cout << "Wine Amount + 1: " << person[i].wineAmount + 1 << endl;
+                cout << "wineAmountOwed: " << wineAmountOwed << endl;
+                cout << "numOfFull: " << numOfFull << endl;
+            }            
         }
-
-        // Check that amount is even, and given everyone same amount of casks
     }
 
+    // Check that amount is even, and given everyone same amount of casks
     while (!barrelAmountEven(person)) {
         for (int i = 0; i < numOfPeople; ++i) {
             if (person[i].barrelAmount + 1 < barrelsOwed && numOfEmpty > 0) {
