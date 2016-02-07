@@ -66,17 +66,19 @@ bool enoughWine() {
 }
 
 void inputAmounts() {
-    cout << "How many Full?";
+    cout << "How many Full?\t";
     cin >> numOfFull;
 
-    cout << "How many Half?";
+    cout << "How many Half?\t";
     cin >> numOfHalf;
 
-    cout << "How many Empty?\n";
+    cout << "How many Empty?\t";
     cin >> numOfEmpty;
 
-    cout << "How many people?";
+    cout << "How many people?\t";
     cin >> numOfPeople;
+
+    cout << "\n\n";
     
     // Compute and Store the number of barrels
     numOfBarrels = numOfFull + numOfHalf + numOfEmpty;
@@ -108,13 +110,13 @@ bool wineAmountEven(struct Person *people) {
 
 bool barrelAmountEven(struct Person *people) {
     bool check = true; 
+    int  amounts[numOfPeople];
 
-    double amounts[numOfPeople];
     for (int i = 0; i < numOfPeople; i++) {
         amounts[i] = people[i].barrelAmount;
     }
 
-    double currentAmount = amounts[0];
+    int currentAmount = amounts[0];
 
     for (int i = numOfPeople - 1; i > 0; i--) {
         if (amounts[i] == currentAmount) {
@@ -152,18 +154,30 @@ void distribute(struct Person *person) {
                 --numOfHalf;
             }
             else {
-                cout << "Person " << i << endl;
-                cout << "Wine Amount + 1: " << person[i].wineAmount + 1 << endl;
-                cout << "wineAmountOwed: " << wineAmountOwed << endl;
-                cout << "numOfFull: " << numOfFull << endl;
+                break;
             }            
         }
     }
 
     // Check that amount is even, and given everyone same amount of casks
-    while (!barrelAmountEven(person)) {
+    /*
+     * Maybe find out who has the most barrels 
+     * then give to the rest until they all have as many as the first
+     */
+    int max = person[0].barrelAmount;
+
+    while (!barrelAmountEven(person) && numOfEmpty > 0) {
         for (int i = 0; i < numOfPeople; ++i) {
-            if (person[i].barrelAmount + 1 < barrelsOwed && numOfEmpty > 0) {
+            if (person[i].barrelAmount < max) {
+                person[i].barrelAmount++;
+                --numOfEmpty;
+            }
+            else if (person[i].barrelAmount > max) {
+                max = person[i].barrelAmount;
+                break; // Needed?
+            }
+            else if (person[i].barrelAmount == max && 
+                        (numOfEmpty % numOfPeople == 0 && numOfEmpty > 0)) {
                 person[i].barrelAmount++;
                 --numOfEmpty;
             }
@@ -171,7 +185,7 @@ void distribute(struct Person *person) {
     }
 
     for (int i = 0; i < numOfPeople; i++) {
-        cout << "\nPerson " << i << endl;
+        cout << "\nPerson " << i + 1 << endl;
         
         cout << "Wine amount: \t";
         cout << person[i].wineAmount << endl;
