@@ -3,10 +3,9 @@
 
 using namespace std;
 
-/*
- * Globals
- */
-
+/*  ***********************************************************
+                        Global Variables  
+    *********************************************************** */
 // User input -- how many of each kind?
 int numOfFull, numOfHalf, numOfEmpty;
 
@@ -26,14 +25,15 @@ struct Person {
 };
 
 
-/*
- * Function Helpers
- */
- 
+/*  ***********************************************************
+                        Work Functions  
+    *********************************************************** */
 bool enoughBarrels() {
 
-    if (numOfBarrels % numOfPeople == 0)
+    if (numOfBarrels % numOfPeople == 0) {
+        barrelsOwed = numOfBarrels / numOfPeople;
         return true;
+    }
     else
         return false;
 }
@@ -132,20 +132,33 @@ bool barrelAmountEven(struct Person *people) {
 }
 
 
-// Distribute until == All wine is equal between the three, all casks are equal
-// between the three, and there are 0 casks left
+/*  -----------------------------------------------------------
+        Uses an array of Person type objects to manipulate 
+    the Person's wineamount and barrelamount 
+    The program will take away from the corresponding global 
+    variables (numOfFull, numOfHalf, numOfEmpty) to represent and 
+    keep track of changes made to these amounts
+    Next, will distribute empty wine casks -- as the wineamountOwed 
+    has already been acheived by using all Full/Half casks, and
+    all that's left is to make sure that all Empty casks have 
+    been distributed.
+    ----------------------------------------------------------- */
 void distribute(struct Person *person) {
     // Loop through as many people as needed
     for (int i = 0; i < numOfPeople; ++i) {
+        // For each person -- Loop through as many times as needed
+        // Breaking when they have been given their wineAmountOwed
         for (int j = 0; j < numOfBarrels; ++j) {
-            // Give Full?
+            // Give Full? -- When current Person's wineAmount + 1 is still less
+            // wineAmountOwed AND there are still Full Casks available
             if (person[i].wineAmount + 1 < wineAmountOwed && 
                     numOfFull > 0) {
                 person[i].wineAmount++;
                 person[i].barrelAmount++;
                 --numOfFull;
             }
-            // Give Half?
+            // Give Half? -- When current Person's wineAmount + 0.5 is still 
+            // less than wineAmountOwed AND there's still Full Casks available
             else if (person[i].wineAmount + 0.5 <= wineAmountOwed && 
                     numOfHalf > 0) {
 
@@ -153,36 +166,30 @@ void distribute(struct Person *person) {
                 person[i].barrelAmount++;
                 --numOfHalf;
             }
+            // Break here because wineAmountOwed has been achieved for Person
             else {
                 break;
             }            
         }
     }
 
+    // TODO: Move to distributeEmptyCasks()
+    // Loop through until there are no more Empty Casks to distribute
     // Check that amount is even, and given everyone same amount of casks
-    /*
-     * Maybe find out who has the most barrels 
-     * then give to the rest until they all have as many as the first
-     */
-    int max = person[0].barrelAmount;
-
-    while (!barrelAmountEven(person) && numOfEmpty > 0) {
+    while (numOfEmpty > 0) {
+        // Loop through each person -- giving them an empty
         for (int i = 0; i < numOfPeople; ++i) {
-            if (person[i].barrelAmount < max) {
+            if (person[i].barrelAmount + 1 <= barrelsOwed) {
                 person[i].barrelAmount++;
                 --numOfEmpty;
             }
-            else if (person[i].barrelAmount > max) {
-                max = person[i].barrelAmount;
-                break; // Needed?
-            }
-            else if (person[i].barrelAmount == max && 
-                        (numOfEmpty % numOfPeople == 0 && numOfEmpty > 0)) {
-                person[i].barrelAmount++;
-                --numOfEmpty;
-            }
+            else
+                continue;
         }
     }
+
+    cout << "Full: " << numOfFull << "\tHalf: " << numOfHalf << 
+        "\tEmpty: " << numOfEmpty << endl;
 
     for (int i = 0; i < numOfPeople; i++) {
         cout << "\nPerson " << i + 1 << endl;
@@ -226,4 +233,3 @@ int main() {
 
     return 0;
 }
-
